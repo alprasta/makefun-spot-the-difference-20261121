@@ -1,8 +1,8 @@
-// Scene 3 — "Harbor at Dusk". A small fishing harbour as the light goes:
-// a striped lighthouse, a sailboat, a rowing boat, gulls overhead, crates
-// on the dock and a buoy bobbing in the swell.
-// variant 0 is the left picture, variant 1 the right one with the seven
-// differences applied.
+// Scene 3 — "Harbor at Dusk". A small fishing harbour as the light
+// goes: a striped lighthouse, a sailboat, a rowing boat, gulls overhead,
+// crates on the dock and a buoy bobbing in the swell. draw(ctx, variant)
+// paints the 600x440 picture; variant 0 is the left picture, variant 1
+// the right one with the seven differences applied.
 import {
   disc, oval, pathDisc, rect, rrect, seg, shape, strokeRrect,
 } from './draw-helpers.js';
@@ -31,8 +31,9 @@ export const harbor = {
     ctx.fillRect(0, 0, 600, 270);
 
     // The first stars of the evening.
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    for (const [sx, sy] of [[60, 40], [150, 28], [240, 48], [350, 30], [440, 34], [290, 20], [190, 70]]) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    const starSpots = [[60, 40], [150, 28], [240, 48], [350, 30], [440, 34], [290, 20], [190, 70]];
+    for (const [sx, sy] of starSpots) {
       pathDisc(ctx, sx, sy, 2);
       ctx.fill();
     }
@@ -52,9 +53,10 @@ export const harbor = {
     sea.addColorStop(1, '#173f57');
     ctx.fillStyle = sea;
     ctx.fillRect(0, 260, 600, 180);
-    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.lineWidth = 3;
-    for (const [wx, wy, wl] of [[120, 300, 60], [300, 330, 80], [450, 305, 55], [200, 380, 70], [380, 395, 90], [520, 350, 50]]) {
+    const waveMarks = [[120, 300, 60], [300, 330, 80], [450, 305, 55], [200, 380, 70], [380, 395, 90], [520, 350, 50]];
+    for (const [wx, wy, wl] of waveMarks) {
       ctx.beginPath();
       ctx.moveTo(wx, wy);
       ctx.quadraticCurveTo(wx + wl / 2, wy - 7, wx + wl, wy);
@@ -74,7 +76,7 @@ export const harbor = {
     shape(ctx, [[50, 98], [85, 76], [120, 98]], '#e2604d');
     // The beam sweeps out to the right — left panel only.
     if (variant === 0) {
-      ctx.fillStyle = 'rgba(255,233,138,0.35)';
+      ctx.fillStyle = 'rgba(255, 233, 138, 0.35)';
       ctx.beginPath();
       ctx.moveTo(114, 100);
       ctx.lineTo(330, 74);
@@ -102,18 +104,20 @@ export const harbor = {
       disc(ctx, 500, 360, 13, '#e05252');
       rect(ctx, 496, 342, 8, 10, '#e05252');
       disc(ctx, 500, 340, 4, '#ffd94d');
-      oval(ctx, 500, 374, 18, 4, 'rgba(255,255,255,0.3)');
+      oval(ctx, 500, 374, 18, 4, 'rgba(255, 255, 255, 0.3)');
     }
 
-    // The wooden dock, bottom left, with crates stacked on it.
+    // The wooden dock, bottom left, with crates on it. Three crates in a
+    // row on the left; the middle one is missing on the right.
     rect(ctx, 0, 368, 250, 72, '#8a5a33');
-    for (let x = 0; x < 250; x += 42) seg(ctx, x, 368, x, 440, '#6e4526', 3);
+    for (let x = 0; x < 250; x += 42) {
+      seg(ctx, x, 368, x, 440, '#6e4526', 3);
+    }
     seg(ctx, 0, 392, 250, 392, '#6e4526', 3);
     seg(ctx, 0, 416, 250, 416, '#6e4526', 3);
-    crate(ctx, 120, 368, 44);
-    crate(ctx, 168, 368, 44);
-    // A third crate sits on top of the other two — left panel only.
-    if (variant === 0) crate(ctx, 144, 324, 44);
+    crate(ctx, 84, 368, 44);
+    if (variant === 0) crate(ctx, 128, 368, 44);
+    crate(ctx, 172, 368, 44);
     // A coil of rope on the dock.
     ctx.strokeStyle = '#d9c08a';
     ctx.lineWidth = 5;
@@ -123,6 +127,8 @@ export const harbor = {
     ctx.stroke();
   },
 };
+
+// --- Little painters, one per motif in the harbour.
 
 function gull(ctx, x, y) {
   ctx.strokeStyle = '#2b2b3a';
@@ -136,6 +142,7 @@ function gull(ctx, x, y) {
 }
 
 function crate(ctx, x, y, s) {
+  // (x, y) is the bottom-left corner; the crate stands s tall on the dock.
   rect(ctx, x, y - s, s, s, '#c89b6a');
   ctx.strokeStyle = '#8a5a33';
   ctx.lineWidth = 3;

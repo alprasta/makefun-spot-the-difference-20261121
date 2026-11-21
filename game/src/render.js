@@ -13,7 +13,9 @@ import {
   SCREEN_LEVEL_CLEAR, SCREEN_LEVEL_FAILED, SCREEN_PAUSED, SCREEN_PLAY,
   SCREEN_TITLE, SCREEN_VICTORY,
 } from './world.js';
-import { disc, label, oval, pathDisc, pathRoundRect, rect, rrect, strokeRrect } from './draw-helpers.js';
+import {
+  disc, label, oval, pathDisc, pathRoundRect, rect, rrect, strokeRrect,
+} from './draw-helpers.js';
 
 function formatTime(seconds) {
   const s = Math.max(0, Math.ceil(seconds));
@@ -34,17 +36,19 @@ export function createRenderer(canvas) {
   }
 
   function toLogical(clientX, clientY) {
+    const ratio = window.devicePixelRatio || 1;
     return {
-      x: (clientX * (window.devicePixelRatio || 1) - view.x) / view.scale,
-      y: (clientY * (window.devicePixelRatio || 1) - view.y) / view.scale,
+      x: (clientX * ratio - view.x) / view.scale,
+      y: (clientY * ratio - view.y) / view.scale,
     };
   }
 
   function drawPanels(state, now) {
     const scene = SCENES[state.level];
-    for (const [origin, variant, tag] of [[PANEL_LEFT, 0, 'LEFT'], [PANEL_RIGHT, 1, 'RIGHT']]) {
+    const panels = [[PANEL_LEFT, 0, 'LEFT'], [PANEL_RIGHT, 1, 'RIGHT']];
+    for (const [origin, variant, tag] of panels) {
       // Panel shadow and the picture itself, clipped to a rounded rect.
-      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
       pathRoundRect(ctx, origin.x + 4, origin.y + 5, PANEL.width, PANEL.height, 14);
       ctx.fill();
       ctx.save();
@@ -56,7 +60,7 @@ export function createRenderer(canvas) {
       ctx.restore();
       strokeRrect(ctx, origin.x, origin.y, PANEL.width, PANEL.height, 12, PALETTE.panelEdge, 3);
       // Tag chip in the panel's top-left corner.
-      rrect(ctx, origin.x + 10, origin.y + 10, 64, 26, 13, 'rgba(23,26,38,0.72)');
+      rrect(ctx, origin.x + 10, origin.y + 10, 64, 26, 13, 'rgba(23, 26, 38, 0.72)');
       label(ctx, tag, origin.x + 42, origin.y + 24, 15, PALETTE.text, 'center', 800);
 
       // Found markers: a gold ring and a check badge, on both panels.
@@ -123,7 +127,7 @@ export function createRenderer(canvas) {
     }
   }
 
-  function drawHeader(state, best) {
+  function drawHeader(state) {
     const scene = SCENES[state.level];
     rect(ctx, 0, 0, FIELD.width, HEADER.height, PALETTE.header);
     label(ctx, 'DOUBLE TAKE', 24, 30, 30, PALETTE.gold, 'left', 800);
@@ -139,7 +143,9 @@ export function createRenderer(canvas) {
     label(ctx, scene.subtitle, 640, 62, 16, PALETTE.muted, 'center', 600);
 
     // Score and the found counter on the right; a live combo rides on the score line.
-    const scoreText = state.combo >= 2 ? `SCORE  ${state.score}  ·  COMBO ×${state.combo}` : `SCORE  ${state.score}`;
+    const scoreText = state.combo >= 2
+      ? `SCORE  ${state.score}  ·  COMBO ×${state.combo}`
+      : `SCORE  ${state.score}`;
     label(ctx, scoreText, 1256, 30, 26, PALETTE.text, 'right', 800);
     const remaining = scene.differences.length - state.found.size;
     const counter = remaining === 0
@@ -151,9 +157,21 @@ export function createRenderer(canvas) {
   function drawFooter(state, soundOn) {
     // Buttons.
     const buttons = [
-      { ...BUTTONS.hint, label: `Hint  (${state.hintsLeft} left · H)`, enabled: state.hintsLeft > 0 && state.screen === SCREEN_PLAY },
-      { ...BUTTONS.pause, label: state.screen === SCREEN_PAUSED ? 'Resume  (P)' : 'Pause  (P)', enabled: true },
-      { ...BUTTONS.sound, label: soundOn ? 'Sound: On  (M)' : 'Sound: Off  (M)', enabled: true },
+      {
+        ...BUTTONS.hint,
+        label: `Hint  (${state.hintsLeft} left · H)`,
+        enabled: state.hintsLeft > 0 && state.screen === SCREEN_PLAY,
+      },
+      {
+        ...BUTTONS.pause,
+        label: state.screen === SCREEN_PAUSED ? 'Resume  (P)' : 'Pause  (P)',
+        enabled: true,
+      },
+      {
+        ...BUTTONS.sound,
+        label: soundOn ? 'Sound: On  (M)' : 'Sound: Off  (M)',
+        enabled: true,
+      },
     ];
     for (const b of buttons) {
       rrect(ctx, b.x, b.y, b.w, b.h, 10, b.enabled ? PALETTE.panel : '#1a1e2c');
@@ -170,7 +188,7 @@ export function createRenderer(canvas) {
   }
 
   function drawOverlay(title, lines, prompt, accent) {
-    ctx.fillStyle = 'rgba(16,18,28,0.72)';
+    ctx.fillStyle = 'rgba(16, 18, 28, 0.72)';
     ctx.fillRect(0, 0, FIELD.width, FIELD.height);
     const w = 680;
     const h = 130 + lines.length * 36 + 64;
@@ -194,7 +212,7 @@ export function createRenderer(canvas) {
 
     if (state.screen === SCREEN_TITLE) {
       drawPanels(state, now);
-      ctx.fillStyle = 'rgba(16,18,28,0.66)';
+      ctx.fillStyle = 'rgba(16, 18, 28, 0.66)';
       ctx.fillRect(0, 0, FIELD.width, FIELD.height);
       label(ctx, 'DOUBLE TAKE', 640, 168, 84, PALETTE.gold, 'center', 800);
       label(ctx, 'A spot-the-difference hunt in three hand-drawn scenes', 640, 232, 26, PALETTE.text, 'center', 600);
@@ -207,7 +225,7 @@ export function createRenderer(canvas) {
       return;
     }
 
-    drawHeader(state, best);
+    drawHeader(state);
     drawPanels(state, now);
     drawFooter(state, soundOn);
 

@@ -1,8 +1,8 @@
-// Scene 2 — "Cozy Kitchen". A warm kitchen in the afternoon: a window with
-// sky, a wall clock, a shelf of mugs, a steaming teapot on the counter, a
-// fruit bowl, a cat in charge of everything and a rug by the stove.
-// variant 0 is the left picture, variant 1 the right one with the seven
-// differences applied.
+// Scene 2 — "Cozy Kitchen". A warm kitchen in the afternoon: a window
+// with sky, a wall clock, a shelf of mugs, a steaming teapot on the
+// counter, a fruit bowl, a cat in charge of everything and a rug by the
+// stove. draw(ctx, variant) paints the 600x440 picture; variant 0 is the
+// left picture, variant 1 the right one with the seven differences.
 import {
   disc, oval, pathDisc, rect, rrect, seg, shape, strokeRrect,
 } from './draw-helpers.js';
@@ -25,21 +25,23 @@ export const kitchen = {
     // Cream wall above a wooden floor.
     rect(ctx, 0, 0, 600, 300, '#f7e8c8');
     rect(ctx, 0, 300, 600, 140, '#c89b6a');
-    for (let y = 318; y < 440; y += 30) seg(ctx, 0, y, 600, y, '#b3854f', 2);
+    for (let y = 318; y < 440; y += 30) {
+      seg(ctx, 0, y, 600, y, '#b3854f', 2);
+    }
 
-    // Window, top left, with sky, sun and red curtains.
-    rrect(ctx, 70, 45, 180, 160, 8, '#8ec9f0');
-    disc(ctx, 215, 80, 20, '#ffd94d');
-    disc(ctx, 105, 175, 14, '#ffffff');
-    disc(ctx, 130, 180, 18, '#ffffff');
+    // Window, top left, with sky, a small sun and red curtains.
+    rrect(ctx, 70, 30, 170, 75, 8, '#8ec9f0');
+    disc(ctx, 205, 58, 16, '#ffd94d');
+    disc(ctx, 100, 88, 11, '#ffffff');
+    disc(ctx, 128, 94, 14, '#ffffff');
     ctx.strokeStyle = '#8a5a33';
     ctx.lineWidth = 5;
-    ctx.strokeRect(70, 45, 180, 160);
-    seg(ctx, 160, 45, 160, 205, '#8a5a33', 4);
-    seg(ctx, 70, 125, 250, 125, '#8a5a33', 4);
-    rect(ctx, 52, 40, 26, 170, '#e2604d');
-    rect(ctx, 242, 40, 26, 170, '#e2604d');
-    rrect(ctx, 58, 205, 204, 12, 4, '#fff3d6');
+    ctx.strokeRect(70, 30, 170, 75);
+    seg(ctx, 155, 30, 155, 105, '#8a5a33', 4);
+    seg(ctx, 70, 67, 240, 67, '#8a5a33', 4);
+    rect(ctx, 52, 25, 26, 88, '#e2604d');
+    rect(ctx, 234, 25, 26, 88, '#e2604d');
+    rrect(ctx, 58, 105, 204, 12, 4, '#fff3d6');
 
     // Wall clock, top centre: 3 o'clock on the left, half past 4 on the right.
     disc(ctx, 330, 70, 36, '#fffdf5');
@@ -71,11 +73,11 @@ export const kitchen = {
     }
 
     // Shelf with four mugs; the second one changes colour.
-    rect(ctx, 60, 236, 220, 10, '#8a5a33');
-    mug(ctx, 80, 206, '#e05252');
-    mug(ctx, 120, 206, variant === 0 ? '#3a6ea5' : '#4f9e4a');
-    mug(ctx, 165, 206, '#f2a541');
-    mug(ctx, 210, 206, '#8a5cf6');
+    rect(ctx, 60, 140, 220, 10, '#8a5a33');
+    mug(ctx, 75, 112, '#e05252');
+    mug(ctx, 120, 112, variant === 0 ? '#3a6ea5' : '#4f9e4a');
+    mug(ctx, 165, 112, '#f2a541');
+    mug(ctx, 210, 112, '#8a5cf6');
 
     // The counter and its cupboards.
     rect(ctx, 0, 300, 600, 18, '#a87c4f');
@@ -86,7 +88,7 @@ export const kitchen = {
     // Teapot on the counter, with steam curling up — left panel only.
     teapot(ctx, 200, 268);
     if (variant === 0) {
-      ctx.strokeStyle = 'rgba(180,190,200,0.9)';
+      ctx.strokeStyle = 'rgba(180, 190, 200, 0.9)';
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.beginPath();
@@ -121,6 +123,8 @@ export const kitchen = {
     oval(ctx, 250, 306, 26, 7, '#f3ead8');
   },
 };
+
+// --- Little painters, one per motif in the kitchen.
 
 function mug(ctx, x, y, color) {
   rrect(ctx, x, y, 30, 28, 4, color);
