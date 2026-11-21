@@ -1,13 +1,14 @@
-// Tiny canvas helpers shared by every scene and by the renderer.
-// A scene never reaches for the raw canvas API to draw a shape: it asks
-// one of these, so the two panels of a scene always share one hand and
-// the art stays consistent. Nothing here knows about the game rules.
+// Tiny canvas helpers shared by the scenes and the renderer.
+//
+// Every helper takes the 2d context first and does exactly one small
+// job: open a path, fill a shape, draw a line, or place some text. The
+// scenes build their pictures out of these pieces, and the renderer
+// uses them for panels, markers and the HUD. Nothing in here knows
+// anything about the game rules — only about pixels.
 
 const TAU = Math.PI * 2;
-const FONT_STACK = 'system-ui, -apple-system, "Segoe UI", sans-serif';
-const SHADOW_FILL = 'rgba(0, 0, 0, 0.35)';
 
-// --- Paths: begin a path, draw nothing yet. The caller fills or strokes.
+// --- paths: open a path, draw nothing yet ---
 
 export function pathDisc(ctx, x, y, r) {
   ctx.beginPath();
@@ -22,21 +23,17 @@ export function pathOval(ctx, x, y, rx, ry) {
 }
 
 export function pathRoundRect(ctx, x, y, w, h, r) {
-  const rad = Math.max(0, Math.min(r, w / 2, h / 2));
+  const rad = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rad, y);
-  ctx.lineTo(x + w - rad, y);
   ctx.arcTo(x + w, y, x + w, y + h, rad);
-  ctx.lineTo(x + w, y + h - rad);
   ctx.arcTo(x + w, y + h, x, y + h, rad);
-  ctx.lineTo(x + rad, y + h);
   ctx.arcTo(x, y + h, x, y, rad);
-  ctx.lineTo(x, y + rad);
   ctx.arcTo(x, y, x + w, y, rad);
   ctx.closePath();
 }
 
-// --- Filled shapes: set the fill colour and fill.
+// --- filled shapes: set the fill colour and fill the shape ---
 
 export function disc(ctx, x, y, r, color) {
   ctx.fillStyle = color;
@@ -61,7 +58,7 @@ export function rrect(ctx, x, y, w, h, r, color) {
   ctx.fill();
 }
 
-// --- Strokes and lines.
+// --- strokes: a rounded outline, and a single line segment ---
 
 export function strokeRrect(ctx, x, y, w, h, r, color, width) {
   ctx.strokeStyle = color;
@@ -80,6 +77,8 @@ export function seg(ctx, x1, y1, x2, y2, color, width) {
   ctx.stroke();
 }
 
+// --- a filled polygon from a list of [x, y] corners ---
+
 export function shape(ctx, points, color) {
   ctx.fillStyle = color;
   ctx.beginPath();
@@ -91,19 +90,20 @@ export function shape(ctx, points, color) {
   ctx.fill();
 }
 
-// --- Text and shadows.
+// --- text: weight + size in pixels, system-ui stack, centred by default ---
 
 export function label(ctx, value, x, y, size, color, align = 'center', weight = 700) {
-  ctx.font = `${weight} ${size}px ${FONT_STACK}`;
+  ctx.font = `${weight} ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
   ctx.fillStyle = color;
   ctx.textAlign = align;
   ctx.textBaseline = 'middle';
   ctx.fillText(value, x, y);
 }
 
-// A soft shadow under a picture panel, offset down and right.
+// --- a soft shadow under a picture panel ---
+
 export function panelShadow(ctx, x, y, w, h) {
-  ctx.fillStyle = SHADOW_FILL;
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
   pathRoundRect(ctx, x + 4, y + 5, w, h, 14);
   ctx.fill();
 }

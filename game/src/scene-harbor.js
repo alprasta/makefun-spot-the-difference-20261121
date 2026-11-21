@@ -1,10 +1,11 @@
 // Scene 3 — "Harbor at Dusk". A small fishing harbour as the light
-// goes: a striped lighthouse, a sailboat, a rowing boat, gulls overhead,
-// crates on the dock and a buoy bobbing in the swell. draw(ctx, variant)
-// paints the 600x440 picture; variant 0 is the left picture, variant 1
-// the right one with the seven differences applied.
+// goes, drawn my own way: a sinking sun, a ferry with a smokestack,
+// a rowing boat, gulls overhead, a striped buoy, a wooden dock with
+// an anchor and a fishing net. draw(ctx, variant): variant 0 is the
+// left picture, variant 1 the right one with the seven differences
+// applied.
 import {
-  disc, oval, pathDisc, rect, rrect, seg, shape, strokeRrect,
+  disc, label, oval, pathDisc, pathOval, rect, rrect, seg, shape,
 } from './draw-helpers.js';
 
 export const harbor = {
@@ -12,124 +13,120 @@ export const harbor = {
   subtitle: 'The last boat in before dark',
   timeLimit: 100,
   differences: [
-    { x: 150, y: 115, r: 30, label: 'the lighthouse beam' },
-    { x: 330, y: 150, r: 30, label: 'the sail changed colour' },
-    { x: 430, y: 62, r: 26, label: 'one of the gulls' },
-    { x: 500, y: 360, r: 22, label: 'the buoy in the water' },
-    { x: 520, y: 55, r: 28, label: 'the moon went crescent' },
-    { x: 150, y: 365, r: 28, label: 'a crate on the dock' },
-    { x: 330, y: 95, r: 20, label: 'the flag on the mast' },
+    { x: 480, y: 125, r: 30, label: 'the sun sank lower' },
+    { x: 335, y: 228, r: 22, label: 'a ferry window went dark' },
+    { x: 400, y: 160, r: 22, label: 'the smoke thinned out' },
+    { x: 180, y: 90, r: 22, label: 'a seagull flew away' },
+    { x: 520, y: 300, r: 22, label: 'the buoy lost its stripes' },
+    { x: 150, y: 385, r: 24, label: 'the anchor vanished' },
+    { x: 360, y: 385, r: 22, label: 'the starfish disappeared' },
   ],
 
   draw(ctx, variant) {
-    // Dusk sky, deep purple up top fading to orange at the horizon.
-    const sky = ctx.createLinearGradient(0, 0, 0, 270);
-    sky.addColorStop(0, '#3a3a6e');
-    sky.addColorStop(0.55, '#7b5ea7');
-    sky.addColorStop(1, '#ff9a5c');
+    // Dusk sky: dusky purple up top fading to orange at the horizon.
+    const sky = ctx.createLinearGradient(0, 0, 0, 240);
+    sky.addColorStop(0, '#5a4a8a');
+    sky.addColorStop(0.6, '#8a5a9a');
+    sky.addColorStop(1, '#ff8a4d');
     ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, 600, 270);
+    ctx.fillRect(0, 0, 600, 240);
 
-    // The first stars of the evening.
+    // The first stars of the evening, high up.
     ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-    const starSpots = [[60, 40], [150, 28], [240, 48], [350, 30], [440, 34], [290, 20], [190, 70]];
-    for (const [sx, sy] of starSpots) {
+    for (const [sx, sy] of [[60, 30], [120, 55], [260, 28], [350, 45], [420, 25], [560, 35]]) {
       pathDisc(ctx, sx, sy, 2);
       ctx.fill();
     }
 
-    // The moon: full on the left, a crescent on the right.
-    disc(ctx, 520, 55, 24, '#f7ead0');
-    if (variant === 1) disc(ctx, 530, 49, 20, '#4a4a80');
+    // The setting sun: higher on the left, sunk lower on the right.
+    const sunY = variant === 0 ? 110 : 145;
+    disc(ctx, 480, sunY, 28, '#ff6b35');
+    disc(ctx, 472, sunY - 8, 10, '#ffb35c');
 
-    // Gulls: three on the left, two on the right.
-    gull(ctx, 400, 55);
-    if (variant === 0) gull(ctx, 430, 70);
-    gull(ctx, 460, 50);
-
-    // The sea, with a few white wave strokes.
-    const sea = ctx.createLinearGradient(0, 260, 0, 440);
-    sea.addColorStop(0, '#2e6f8e');
-    sea.addColorStop(1, '#173f57');
+    // The sea, with a few pale wave strokes.
+    const sea = ctx.createLinearGradient(0, 240, 0, 440);
+    sea.addColorStop(0, '#2a5a7a');
+    sea.addColorStop(1, '#16324a');
     ctx.fillStyle = sea;
-    ctx.fillRect(0, 260, 600, 180);
+    ctx.fillRect(0, 240, 600, 200);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
     ctx.lineWidth = 3;
-    const waveMarks = [[120, 300, 60], [300, 330, 80], [450, 305, 55], [200, 380, 70], [380, 395, 90], [520, 350, 50]];
-    for (const [wx, wy, wl] of waveMarks) {
+    for (const [wx, wy, wl] of [[80, 290, 55], [260, 320, 70], [430, 295, 50], [150, 400, 65], [380, 410, 80], [520, 370, 45]]) {
       ctx.beginPath();
       ctx.moveTo(wx, wy);
       ctx.quadraticCurveTo(wx + wl / 2, wy - 7, wx + wl, wy);
       ctx.stroke();
     }
 
-    // The lighthouse on the point: a striped tower with a lamp room.
-    rect(ctx, 52, 240, 66, 30, '#5b4636');
-    rect(ctx, 60, 120, 50, 122, '#fff3d6');
-    rect(ctx, 60, 150, 50, 18, '#e2604d');
-    rect(ctx, 60, 196, 50, 18, '#e2604d');
-    ctx.strokeStyle = '#5b4636';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(60, 120, 50, 122);
-    rrect(ctx, 56, 96, 58, 26, 4, '#2b2b3a');
-    disc(ctx, 85, 109, 9, '#ffe98a');
-    shape(ctx, [[50, 98], [85, 76], [120, 98]], '#e2604d');
-    // The beam sweeps out to the right — left panel only.
-    if (variant === 0) {
-      ctx.fillStyle = 'rgba(255, 233, 138, 0.35)';
-      ctx.beginPath();
-      ctx.moveTo(114, 100);
-      ctx.lineTo(330, 74);
-      ctx.lineTo(330, 140);
-      ctx.lineTo(114, 118);
-      ctx.closePath();
-      ctx.fill();
+    // The ferry in the middle: hull, deckhouse, five windows and a
+    // smokestack. One window is dark on the right, and the smoke is
+    // thinner there too.
+    shape(ctx, [[200, 260], [400, 260], [385, 300], [215, 300]], '#232838');
+    rect(ctx, 200, 255, 200, 8, '#f3ead8');
+    rrect(ctx, 230, 210, 140, 48, 8, '#e8dcc2');
+    const windows = [245, 275, 305, 335, 365];
+    for (let i = 0; i < windows.length; i += 1) {
+      const wx = windows[i];
+      const lit = !(variant === 1 && wx === 335);
+      rect(ctx, wx, 222, 16, 16, lit ? '#ffe08a' : '#2b2b3a');
     }
+    rect(ctx, 388, 185, 22, 68, '#3a3a3a');
+    rect(ctx, 384, 178, 30, 10, '#232838');
+    disc(ctx, 400, 168, 10, 'rgba(230, 230, 230, 0.75)');
+    if (variant === 0) {
+      disc(ctx, 394, 148, 8, 'rgba(230, 230, 230, 0.6)');
+      disc(ctx, 406, 130, 7, 'rgba(230, 230, 230, 0.45)');
+    }
+    seg(ctx, 300, 210, 300, 175, '#5b4636', 5);
 
-    // The sailboat in the middle. Its big sail is red on the left, white
-    // on the right, and it flies a small flag only on the left.
-    seg(ctx, 330, 88, 330, 250, '#5b4636', 6);
-    shape(ctx, [[330, 96], [330, 210], [392, 210]], variant === 0 ? '#e2604d' : '#fff3d6');
-    shape(ctx, [[324, 110], [324, 210], [282, 210]], '#f2a541');
-    shape(ctx, [[292, 250], [368, 250], [352, 272], [308, 272]], '#7a4a2b');
-    if (variant === 0) shape(ctx, [[330, 88], [362, 96], [330, 104]], '#e05252');
-
-    // A rowing boat, off to the right.
+    // A rowing boat off to the right, with one oar shipped.
     shape(ctx, [[452, 330], [540, 330], [522, 348], [470, 348]], '#8a5a33');
     seg(ctx, 470, 330, 452, 312, '#5b4636', 4);
     seg(ctx, 522, 330, 540, 312, '#5b4636', 4);
 
-    // The buoy bobbing in the swell — left panel only.
-    if (variant === 0) {
-      disc(ctx, 500, 360, 13, '#e05252');
-      rect(ctx, 496, 342, 8, 10, '#e05252');
-      disc(ctx, 500, 340, 4, '#ffd94d');
-      oval(ctx, 500, 374, 18, 4, 'rgba(255, 255, 255, 0.3)');
-    }
+    // Gulls overhead: three on the left, two on the right.
+    gull(ctx, 140, 70);
+    if (variant === 0) gull(ctx, 180, 95);
+    gull(ctx, 220, 60);
 
-    // The wooden dock, bottom left, with crates on it. Three crates in a
-    // row on the left; the middle one is missing on the right.
-    rect(ctx, 0, 368, 250, 72, '#8a5a33');
-    for (let x = 0; x < 250; x += 42) {
-      seg(ctx, x, 368, x, 440, '#6e4526', 3);
+    // The buoy bobbing in the swell. It wears two white bands on the
+    // left; on the right it is plain red.
+    disc(ctx, 520, 300, 13, '#d94f3d');
+    rect(ctx, 516, 284, 8, 10, '#d94f3d');
+    disc(ctx, 520, 282, 4, '#f7c948');
+    if (variant === 0) {
+      rect(ctx, 508, 296, 24, 5, '#fff3d6');
+      rect(ctx, 509, 306, 22, 4, '#fff3d6');
     }
-    seg(ctx, 0, 392, 250, 392, '#6e4526', 3);
-    seg(ctx, 0, 416, 250, 416, '#6e4526', 3);
-    crate(ctx, 84, 368, 44);
-    if (variant === 0) crate(ctx, 128, 368, 44);
-    crate(ctx, 172, 368, 44);
-    // A coil of rope on the dock.
+    oval(ctx, 520, 314, 18, 4, 'rgba(255, 255, 255, 0.3)');
+
+    // The wooden dock, bottom left, with plank lines.
+    rect(ctx, 0, 360, 250, 80, '#8a5a33');
+    for (let x = 0; x < 250; x += 42) seg(ctx, x, 360, x, 440, '#6e4526', 3);
+    seg(ctx, 0, 384, 250, 384, '#6e4526', 3);
+    seg(ctx, 0, 408, 250, 408, '#6e4526', 3);
+
+    // A lantern post on the dock, glowing warm.
+    rect(ctx, 56, 300, 8, 62, '#3a2b1e');
+    rrect(ctx, 46, 282, 28, 20, 4, '#2b2b3a');
+    disc(ctx, 60, 292, 6, '#ffe08a');
+
+    // An anchor leaning against the dock — left picture only.
+    if (variant === 0) anchorShape(ctx, 150, 385);
+
+    // A fishing net draped over the dock edge, with a starfish on it
+    // on the left picture only.
     ctx.strokeStyle = '#d9c08a';
-    ctx.lineWidth = 5;
-    pathDisc(ctx, 60, 408, 16);
-    ctx.stroke();
-    pathDisc(ctx, 60, 408, 9);
-    ctx.stroke();
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i += 1) {
+      seg(ctx, 320 + i * 18, 368, 320 + i * 18, 404, '#d9c08a', 2);
+      seg(ctx, 320, 368 + i * 9, 408, 368 + i * 9, '#d9c08a', 2);
+    }
+    if (variant === 0) starfish(ctx, 360, 385);
   },
 };
 
-// --- Little painters, one per motif in the harbour.
-
+// A gull in flight: two curved wings meeting in the middle.
 function gull(ctx, x, y) {
   ctx.strokeStyle = '#2b2b3a';
   ctx.lineWidth = 3;
@@ -141,12 +138,42 @@ function gull(ctx, x, y) {
   ctx.stroke();
 }
 
-function crate(ctx, x, y, s) {
-  // (x, y) is the bottom-left corner; the crate stands s tall on the dock.
-  rect(ctx, x, y - s, s, s, '#c89b6a');
-  ctx.strokeStyle = '#8a5a33';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(x, y - s, s, s);
-  seg(ctx, x, y - s, x + s, y, '#8a5a33', 2);
-  seg(ctx, x + s, y - s, x, y, '#8a5a33', 2);
+// An anchor: a ring on top, a straight shaft, a crossbar, and two
+// flukes at the bottom.
+function anchorShape(ctx, x, y) {
+  ctx.strokeStyle = '#2b2b3a';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(x, y - 22, 7, 0, Math.PI * 2);
+  ctx.stroke();
+  seg(ctx, x, y - 15, x, y + 18, '#2b2b3a', 5);
+  seg(ctx, x - 14, y - 6, x + 14, y - 6, '#2b2b3a', 5);
+  ctx.beginPath();
+  ctx.moveTo(x - 16, y + 4);
+  ctx.quadraticCurveTo(x - 16, y + 22, x, y + 18);
+  ctx.quadraticCurveTo(x + 16, y + 22, x + 16, y + 4);
+  ctx.stroke();
+  shape(ctx, [[x - 20, y + 2], [x - 12, y + 2], [x - 16, y + 12]], '#2b2b3a');
+  shape(ctx, [[x + 20, y + 2], [x + 12, y + 2], [x + 16, y + 12]], '#2b2b3a');
+}
+
+// A little orange starfish with five arms.
+function starfish(ctx, x, y) {
+  ctx.fillStyle = '#eda23e';
+  ctx.beginPath();
+  for (let i = 0; i < 5; i += 1) {
+    const a = -Math.PI / 2 + (i / 5) * Math.PI * 2;
+    const tipX = x + Math.cos(a) * 13;
+    const tipY = y + Math.sin(a) * 13;
+    const midA = a + Math.PI / 5;
+    const midX = x + Math.cos(midA) * 5;
+    const midY = y + Math.sin(midA) * 5;
+    if (i === 0) ctx.moveTo(tipX, tipY);
+    else ctx.lineTo(tipX, tipY);
+    ctx.lineTo(midX, midY);
+  }
+  ctx.closePath();
+  ctx.fill();
+  disc(ctx, x, y, 3, '#d94f3d');
 }

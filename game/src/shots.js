@@ -1,15 +1,16 @@
-// The screenshot scenes behind ?shot=start|play|play2|end. Each one stages
-// the real game state — no fake pixels: the play shots are mid-level with
-// some differences already ringed in gold and several still hidden, and
-// the counter shows how many remain, exactly as the bounty asks.
-// After painting twice, window.__shotReady is set for the screenshot.
+// The screenshot scenes behind ?shot=start|play|play2|end. Each one
+// stages the real game state — no fake pixels: the play shots are
+// mid-level with some differences already ringed in gold and several
+// still hidden, and the counter shows how many remain, exactly as the
+// bounty asks. After painting twice, window.__shotReady is set for
+// the screenshot.
 import { SCREEN_TITLE, SCREEN_VICTORY } from './world.js';
 import { SCENES } from './scenes.js';
 
-// What each named shot shows. found: which differences are already ringed.
-// score/levelScore/timeLeft/hintsLeft/combo: the HUD numbers. label: the
-// "Found: ..." toast. levelScores: the scores of the finished scenes.
-// best: the best score shown on the frame.
+// What each named shot shows. found: which differences are already
+// ringed. score/levelScore/timeLeft/hintsLeft/combo: the HUD numbers.
+// label: the "Found: ..." toast. levelScores: the scores of the
+// finished scenes. best: the best score shown on the frame.
 const SHOTS = {
   start: {
     level: 0, screen: SCREEN_TITLE, found: [], score: 0, timeLeft: null,
@@ -17,12 +18,12 @@ const SHOTS = {
   },
   play: {
     level: 0, screen: null, found: [0, 2, 4], score: 350, levelScore: 350,
-    timeLeft: 74, hintsLeft: 2, combo: 2, label: 'the curtain in the window',
+    timeLeft: 74, hintsLeft: 2, combo: 2, label: 'the bird on the birdhouse',
     best: 0,
   },
   play2: {
     level: 2, screen: null, found: [0, 1, 2, 4, 6], score: 1240, levelScore: 640,
-    timeLeft: 41, hintsLeft: 1, combo: 2, label: 'the sail changed colour',
+    timeLeft: 41, hintsLeft: 1, combo: 2, label: 'the buoy lost its stripes',
     levelScores: [420, 380], best: 1150,
   },
   end: {
@@ -31,7 +32,7 @@ const SHOTS = {
   },
 };
 
-/** Set `world` to the named shot and return the best score to show. */
+// Set `world` to the named shot and return the best score to show.
 export function stageShot(name, world) {
   const shot = SHOTS[name] ?? SHOTS.start;
   const state = world.state;
@@ -63,7 +64,7 @@ export function stageShot(name, world) {
   return shot.best;
 }
 
-/** Paint the staged scene twice, then signal that the shot is ready. */
+// Paint the staged scene twice, then signal that the shot is ready.
 export function runShot(name, world, renderer) {
   const best = stageShot(name, world);
   let painted = 0;
